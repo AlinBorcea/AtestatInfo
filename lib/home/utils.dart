@@ -34,31 +34,3 @@ Widget topBar3(
     ),
   );
 }
-
-Widget carCard(Car car, BuildContext context) {
-  TextStyle infoStyle = new TextStyle(fontSize: 18.0);
-  return Card(
-    elevation: 4.0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8.0),
-    ),
-    child: Container(
-      margin: EdgeInsets.only(left: 8.0, top: 2.0, bottom: 2.0, right: 2.0),
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('Producator: ${car.brand}', style: infoStyle),
-          Divider(),
-          Text('Nume: ${car.name}', style: infoStyle,),
-          Divider(),
-          Text('An fabricare: ${car.manufactureYear}', style: infoStyle),
-          Divider(),
-          Text('Culoare: ${car.color.toString()}', style: infoStyle,),
-          Divider(),
-          Text('Numar inmatriculare: ${car.plateNumber}', style: infoStyle,),
-        ],
-      ),
-    ),
-  );
-}
