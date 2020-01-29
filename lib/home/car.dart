@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'tax.dart';
 
 class Car {
   static const String brandKey = 'brand';
@@ -6,15 +7,17 @@ class Car {
   static const String plateNumberKey = 'plateNumber';
   static const String colorKey = 'color';
   static const String manufactureYearKey = 'manufactureYear';
+  static const String taxesKey = 'taxes';
 
   String _brand;
   String _name;
   String _plateNumber;
   Color _color;
   int _manufactureYear;
+  List<Tax> _taxes;
 
   Car(this._brand, this._name, this._plateNumber, this._color,
-      this._manufactureYear);
+      this._manufactureYear, this._taxes);
 
   Car.fromMap(Map<String, dynamic> carMap) {
     _brand = carMap[brandKey];
@@ -22,6 +25,7 @@ class Car {
     _plateNumber = carMap[plateNumberKey];
     _color = Color(carMap[colorKey]);
     _manufactureYear = carMap[manufactureYearKey];
+    _taxes = carMap[taxesKey];
   }
 
   int get manufactureYear => _manufactureYear;
@@ -34,6 +38,8 @@ class Car {
 
   String get brand => _brand;
 
+  List<Tax> get taxes => _taxes;
+
   Map<String, dynamic> toMap() {
     return {
       brandKey: _brand,
@@ -41,6 +47,7 @@ class Car {
       plateNumberKey: _plateNumber,
       colorKey: _color,
       manufactureYearKey: _manufactureYear,
+      taxesKey: _taxes,
     };
   }
 

@@ -1,4 +1,4 @@
-name: taxe_masina
+name: taxe_auto
 description: A new Flutter application.
 
 # The following defines the version and build number for your application.
@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  cloud_firestore:
   flutter:
     sdk: flutter
 
@@ -27,6 +28,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  shared_preferences: 0.5.6+1
 
 
 # For information on the generic Dart part of this file, see the

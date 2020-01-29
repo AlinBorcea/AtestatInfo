@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:taxe_masina/home/car.dart';
+import 'package:taxe_auto/home/car.dart';
 import 'utils.dart';
 
 class MoreInfo extends StatefulWidget {
@@ -34,14 +34,7 @@ class _MoreInfoState extends State<MoreInfo> {
                     bottomRight: Radius.circular(28.0),
                   ),
                 ),
-                child: topBar3(
-                  'More Info',
-                  Icons.arrow_back_ios,
-                  () => Navigator.of(context).pop(),
-                  Icons.mode_edit,
-                  () => debugPrint(
-                      'editing ${widget._car.brand} ${widget._car.name}'),
-                ),
+                child: null,
               ),
               /// car info
               Container(
