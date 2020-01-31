@@ -38,6 +38,7 @@ class _RoundTopbarState extends State<RoundTopbar> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           widget.left,
           widget.title,
@@ -46,4 +47,12 @@ class _RoundTopbarState extends State<RoundTopbar> {
       ),
     );
   }
+}
+
+Widget waitingWidget() {
+  return Icon(Icons.cloud_download);
+}
+
+Widget noConnectionWidget() {
+  return Icon(Icons.not_interested);
 }

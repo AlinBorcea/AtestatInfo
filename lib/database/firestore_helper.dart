@@ -11,7 +11,5 @@ Future<Car> getDefCar(String name) async {
 
 Future<String> getDefCarName() async {
   var ds = await Firestore.instance.collection('extra').document('defcar').get();
-  var str = ds.data['name'];
-  debugPrint(str);
-  return str.toString();
+  return ds.data['name'];
 }
