@@ -30,61 +30,69 @@ class _HomeState extends State<Home> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              /// Appbar
-              RoundTopbar(
-                height: 76,
+        child: Column(
+          children: <Widget>[
+            /// CarCard
+            Container(
+              margin: EdgeInsets.only(top: 32.0),
+              child: CarView(
+                background: 'images/porsche.jpg',
+                height: 256.0,
                 width: size.width,
-                color: Colors.red,
+                elevation: 8.0,
                 roundness: 16.0,
-                left: IconButton(
-                  icon: Icon(Icons.menu),
-                  onPressed: () {
-                    debugPrint('pressed on menu');
-                  },
+                title: 'Porsche',
+                titleStyle: TextStyle(
+                  fontSize: 32.0,
+                  color: Colors.white,
                 ),
-                title: Text(_defCarName),
-                right: IconButton(
-                  icon: Icon(Icons.info),
-                  onPressed: () {
-                    debugPrint('pressed on info');
-                  },
-                ),
+                subtitle: 'GTX 911 Coupé',
+                subtitleStyle: TextStyle(fontSize: 22.0, color: Colors.white),
+
+                icon1: Icons.menu,
+                link1: 'Menu',
+                fun1: () => debugPrint('menu'),
+
+                icon2: Icons.change_history,
+                link2: 'Change',
+                fun2: () => debugPrint('change'),
+
+                icon3: Icons.info,
+                link3: 'Info',
+                fun3: () => debugPrint('info'),
               ),
+            ),
 
-              /// body
-              StreamBuilder<QuerySnapshot>(
-                stream: Firestore.instance.collection('car').snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) return Text(snapshot.error);
+            /// body
+            StreamBuilder<QuerySnapshot>(
+              stream: Firestore.instance.collection('car').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) return Text(snapshot.error);
 
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return waitingWidget();
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return waitingWidget();
 
-                    case ConnectionState.none:
-                      return noConnectionWidget();
+                  case ConnectionState.none:
+                    return noConnectionWidget();
 
-                    default:
-                      return ListView(
-                        children: snapshot.data.documents
-                            .map((DocumentSnapshot snapshot) {
-                          debugPrint(
-                              '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}');
-                          return ListTile(
-                            title: Text(
-                                '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}'),
-                          );
-                        }).toList(),
-                      );
-                  }
-                },
-              ),
-            ],
-          ),
+                  default:
+                    return ListView(
+                      children: snapshot.data.documents
+                          .map((DocumentSnapshot snapshot) {
+                        debugPrint(
+                            '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}');
+                        return ListTile(
+                          title: Text(
+                              '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}'),
+                        );
+                      }).toList(),
+                    );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
