@@ -27,9 +27,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(_defCarName);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SingleChildScrollView(
+      body: Center(
         child: Column(
           children: <Widget>[
             /// CarCard
@@ -46,28 +47,28 @@ class _HomeState extends State<Home> {
                   fontSize: 32.0,
                   color: Colors.white,
                 ),
-                subtitle: 'GTX 911 Coupé',
+                subtitle: _defCarName,
                 subtitleStyle: TextStyle(fontSize: 22.0, color: Colors.white),
-
                 icon1: Icons.menu,
                 link1: 'Menu',
                 fun1: () => debugPrint('menu'),
-
                 icon2: Icons.change_history,
                 link2: 'Change',
                 fun2: () => debugPrint('change'),
-
                 icon3: Icons.info,
                 link3: 'Info',
                 fun3: () => debugPrint('info'),
               ),
             ),
 
-            /// body
+            /// taxes
             StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance.collection('car').snapshots(),
+              stream: Firestore.instance.collection(_defCarName).snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
+                String taxStr;
+                int i = 0;
+
                 if (snapshot.hasError) return Text(snapshot.error);
 
                 switch (snapshot.connectionState) {
@@ -78,14 +79,11 @@ class _HomeState extends State<Home> {
                     return noConnectionWidget();
 
                   default:
-                    return ListView(
+                    return Column(
                       children: snapshot.data.documents
                           .map((DocumentSnapshot snapshot) {
-                        debugPrint(
-                            '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}');
                         return ListTile(
-                          title: Text(
-                              '${snapshot[Car.brandKey]} ${snapshot[Car.nameKey]}'),
+                          title: Text(_buildTax(snapshot.data)),
                         );
                       }).toList(),
                     );
@@ -97,4 +95,16 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  
+  String _buildTax(Map<String, dynamic> taxes) {
+    List<dynamic> fields = taxes['taxes'];
+    String str = '';
+
+    for (dynamic field in fields) {
+      str += '$field ${taxes[field]}\n';
+    }
+
+    return str;
+  }
+  
 }
