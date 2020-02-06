@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taxe_auto/app_widgets/widgets.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
-import 'car.dart';
+import 'edit_tax.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -92,6 +92,10 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditTax(0))),
       ),
     );
   }
