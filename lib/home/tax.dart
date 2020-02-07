@@ -1,15 +1,20 @@
-
 class Tax {
-  int _icon;
+  static const String nameKey = 'name';
+  static const String valueKey = 'value';
+
   String _name;
   String _value;
 
-  Tax(this._icon, this._name, this._value);
-
-  int get icon => _icon;
+  Tax(this._name, this._value);
 
   String get name => _name;
 
   String get value => _value;
 
+  Map<String, dynamic> toMap() {
+    return {
+      nameKey: _name,
+      valueKey: _value,
+    };
+  }
 }

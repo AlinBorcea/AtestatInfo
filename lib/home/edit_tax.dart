@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'tax.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 
 class EditTax extends StatefulWidget {
-  EditTax(this._operation);
+  EditTax(this._collection, this._operation);
 
+  final String _collection;
   final int _operation;
   static int addOperation = 0;
   static int editOperation = 1;
@@ -39,7 +41,7 @@ class _EditTaxState extends State<EditTax> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.done),
-            onPressed: () {},
+            onPressed: () => _editData(),
           ),
         ],
       ),
@@ -57,13 +59,19 @@ class _EditTaxState extends State<EditTax> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.minimize, size: 32.0,),
+                  icon: Icon(
+                    Icons.minimize,
+                    size: 32.0,
+                  ),
                   onPressed: () {
                     _removeField();
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.add_circle, size: 32.0,),
+                  icon: Icon(
+                    Icons.add_circle,
+                    size: 32.0,
+                  ),
                   onPressed: () {
                     _addField();
                   },
@@ -109,5 +117,17 @@ class _EditTaxState extends State<EditTax> {
         ),
       ));
     });
+  }
+
+  void _editData() async {
+    if (widget._operation == EditTax.addOperation) {
+      for (int i = 0; i < _nameControllers.length; i++)
+        addTax(Tax(_nameControllers[i].text, _valueControllers[i].text),
+            widget._collection);
+    } else {
+      for (int i = 0; i < _nameControllers.length; i++)
+        updateTax(Tax(_nameControllers[i].text, _valueControllers[i].text),
+            widget._collection);
+    }
   }
 }
