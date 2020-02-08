@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:taxe_auto/app_widgets/widgets.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'edit_tax.dart';
+import 'tax.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -40,7 +41,10 @@ class _HomeState extends State<Home> {
             ),
 
             /// taxes
-            _taxesBody(),
+            Container(
+              margin: EdgeInsets.only(top: 24.0),
+              child: _taxesBody(),
+            ),
           ],
         ),
       ),
@@ -101,7 +105,9 @@ class _HomeState extends State<Home> {
                     children: snapshot.data.documents
                         .map((DocumentSnapshot snapshot) {
                       return ListTile(
-                        title: Text('tax'),
+                        leading: Icon(Icons.local_taxi),
+                        title: Text('${snapshot.data[Tax.nameKey]}'),
+                        subtitle: Text('${snapshot.data[Tax.valueKey]}'),
                       );
                     }).toList(),
                   );
