@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tax.dart';
+import '../models/tax.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 
 class EditTax extends StatefulWidget {
@@ -26,6 +26,13 @@ class _EditTaxState extends State<EditTax> {
     _addField();
     _title =
         widget._operation == EditTax.addOperation ? 'Add a tax' : 'Edit tax';
+  }
+
+
+  @override
+  void dispose() {
+    disposeControllers();
+    super.dispose();
   }
 
   @override
@@ -117,6 +124,13 @@ class _EditTaxState extends State<EditTax> {
         ),
       ));
     });
+  }
+
+  void disposeControllers() {
+    for (int i = 0; i < _nameControllers.length; i++) {
+      _nameControllers[i].dispose();
+      _valueControllers[i].dispose();
+    }
   }
 
   void _editData() async {

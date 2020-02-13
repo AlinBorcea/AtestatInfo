@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taxe_auto/home/car.dart';
+import 'package:taxe_auto/models/car.dart';
 
 class MoreInfo extends StatefulWidget {
   MoreInfo(this._car);
