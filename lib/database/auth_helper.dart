@@ -8,15 +8,7 @@ Future<bool> isLoggedIn() async {
   return await _auth.currentUser() != null;
 }
 
-Future<bool> registerUser(String email, String password) async {
-  final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
-          email: email, password: password))
-      .user;
-
-  return user != null;
-}
-
-Future<bool> signInWithGoogle() async {
+void signInWithGoogle() async {
   final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
   final AuthCredential credential = GoogleAuthProvider.getCredential(
@@ -30,6 +22,4 @@ Future<bool> signInWithGoogle() async {
 
   final FirebaseUser currentUser = await _auth.currentUser();
   assert(user.uid == currentUser.uid);
-
-  return user != null;
 }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
 import 'package:taxe_auto/home/main_page.dart';
-import 'package:taxe_auto/home/user_setup.dart';
 
 class Home extends StatefulWidget {
   @override
-  State createState() => new _HomeState();
+  State createState() => _HomeState();
 }
 
+/// [_finished] true if the user sign in process is finished.
+/// [_isSignedIn] false if there is no user.
 class _HomeState extends State<Home> {
   bool _finished = false;
   bool _isSignedIn;
@@ -20,6 +21,10 @@ class _HomeState extends State<Home> {
 
   void _init() async {
     bool isSignedIn = await isLoggedIn();
+    if (!isSignedIn)
+      signInWithGoogle();
+
+    isSignedIn = await isLoggedIn();
     setState(() {
       _isSignedIn = isSignedIn;
       _finished = true;
@@ -28,9 +33,37 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_finished) return Text('Signing in...');
+    return Scaffold(
+      body: _appBody(),
+    );
+  }
+
+  Widget _appBody() {
+    if (!_finished) return _signingInWidget();
     if (_isSignedIn) return MainPage('');
-    return RegisterUser();
+    return _signInErrorWidget();
+  }
+
+  Widget _signingInWidget() {
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Icon(Icons.assignment),
+          Text('Signing in..'),
+        ],
+      ),
+    );
+  }
+
+  Widget _signInErrorWidget() {
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Icon(Icons.error),
+          Text('Error...'),
+        ],
+      ),
+    );
   }
 
 }
