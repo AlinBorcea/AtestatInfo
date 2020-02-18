@@ -48,7 +48,7 @@ class _EditTaxState extends State<EditTax> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.done),
-            onPressed: () => _editData(),
+            //onPressed: () => _editData(),
           ),
         ],
       ),
@@ -133,7 +133,7 @@ class _EditTaxState extends State<EditTax> {
     }
   }
 
-  void _editData() async {
+  /*void _editData() async {
     if (widget._operation == EditTax.addOperation) {
       for (int i = 0; i < _nameControllers.length; i++)
         addTax(Tax(_nameControllers[i].text, _valueControllers[i].text),
@@ -143,5 +143,5 @@ class _EditTaxState extends State<EditTax> {
         updateTax(Tax(_nameControllers[i].text, _valueControllers[i].text),
             widget._collection);
     }
-  }
+  }*/
 }

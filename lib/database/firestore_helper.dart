@@ -1,23 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:taxe_auto/database/auth_helper.dart';
 import 'package:taxe_auto/models/tax.dart';
 
-final Firestore _fireStore = Firestore.instance;
+class FirestoreHelper {
+  FirestoreHelper() {
+    _initCar();
+  }
 
-Future<String> getDefCarName() async {
-  var ds = await _fireStore.collection('def').document('defcar').get();
-  return ds.data['name'];
-}
+  Firestore _firestore = Firestore.instance;
+  String _defCarName;
 
-Future<Null> addTax(Tax tax, String collection) async {
-  await _fireStore
-      .collection(collection)
-      .document(tax.name)
-      .setData(tax.toMap());
-}
+  void _initCar() async {
+    _defCarName = await getDefCarName();
+  }
 
-Future<Null> updateTax(Tax tax, String collection) async {
-  await _fireStore
-      .collection(collection)
-      .document(tax.name)
-      .updateData(tax.toMap());
+  String get defCarName => _defCarName;
+
+  Future<String> getDefCarName() async {
+
+  }
+
+  Future<Null> addTax(Tax tax, String collection) async {
+    await _firestore
+        .collection(collection)
+        .document(tax.name)
+        .setData(tax.toMap());
+  }
+
+  Future<Null> updateTax(Tax tax, String collection) async {
+    await _firestore
+        .collection(collection)
+        .document(tax.name)
+        .updateData(tax.toMap());
+  }
+
+  Future<bool> userExists(FirebaseUser user) async {
+    return _firestore
+        .collection('users')
+        .where('uid', isEqualTo: '${user.uid}')
+        .getDocuments()
+        .then((QuerySnapshot snapshot) {
+          return snapshot.documents.length == 1;
+    });
+  }
+
+  void addUser(FirebaseUser user) async {
+    if (!await userExists(user))
+      _firestore.collection('users').document(user.uid).setData({
+        'uid': user.uid,
+      });
+  }
 }

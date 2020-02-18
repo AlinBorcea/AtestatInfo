@@ -10,6 +10,7 @@ class Home extends StatefulWidget {
 /// [_finished] true if the user sign in process is finished.
 /// [_isSignedIn] false if there is no user.
 class _HomeState extends State<Home> {
+  AuthHelper _authHelper = AuthHelper();
   bool _finished = false;
   bool _isSignedIn;
 
@@ -20,11 +21,11 @@ class _HomeState extends State<Home> {
   }
 
   void _init() async {
-    bool isSignedIn = await isLoggedIn();
+    bool isSignedIn = await _authHelper.isLoggedIn();
     if (!isSignedIn)
-      signInWithGoogle();
+      _authHelper.signInWithGoogle();
 
-    isSignedIn = await isLoggedIn();
+    isSignedIn = await _authHelper.isLoggedIn();
     setState(() {
       _isSignedIn = isSignedIn;
       _finished = true;
@@ -40,7 +41,7 @@ class _HomeState extends State<Home> {
 
   Widget _appBody() {
     if (!_finished) return _signingInWidget();
-    if (_isSignedIn) return MainPage('');
+    if (_isSignedIn) return MainPage();
     return _signInErrorWidget();
   }
 
