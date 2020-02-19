@@ -5,21 +5,27 @@ import 'package:taxe_auto/database/auth_helper.dart';
 import 'package:taxe_auto/models/tax.dart';
 
 class FirestoreHelper {
-  FirestoreHelper() {
-    _initCar();
-  }
-
   Firestore _firestore = Firestore.instance;
+  String _uid;
   String _defCarName;
 
-  void _initCar() async {
+  Future<Null> initCar() async {
     _defCarName = await getDefCarName();
+    debugPrint(_defCarName);
   }
+
+  set uid(String uid) => _uid = uid;
 
   String get defCarName => _defCarName;
 
   Future<String> getDefCarName() async {
-
+    return await _firestore
+        .collection('users')
+        .document(_uid)
+        .get()
+        .then((snapshot) {
+          return snapshot.data['defCar'];
+    });
   }
 
   Future<Null> addTax(Tax tax, String collection) async {
@@ -42,7 +48,7 @@ class FirestoreHelper {
         .where('uid', isEqualTo: '${user.uid}')
         .getDocuments()
         .then((QuerySnapshot snapshot) {
-          return snapshot.documents.length == 1;
+      return snapshot.documents.length == 1;
     });
   }
 

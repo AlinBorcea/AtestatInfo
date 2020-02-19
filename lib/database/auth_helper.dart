@@ -12,6 +12,8 @@ class AuthHelper {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   FirebaseUser _user;
 
+  FirebaseUser get user => _user;
+
   void _init() async {
     _user = await _auth.currentUser();
   }
@@ -20,7 +22,7 @@ class AuthHelper {
     return await _auth.currentUser() != null;
   }
 
-  void signInWithGoogle() async {
+  Future<Null> signInWithGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
     await googleUser.authentication;
