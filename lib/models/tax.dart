@@ -1,20 +1,25 @@
 class Tax {
-  static const String nameKey = 'name';
+  static const String titleKey = 'title';
   static const String valueKey = 'value';
+  static const String currencyKey = 'currency';
 
-  String _name;
-  String _value;
+  String _title;
+  int _value;
+  String _currency;
 
-  Tax(this._name, this._value);
+  Tax(this._title, this._value, this._currency);
 
-  String get name => _name;
+  String get title => _title;
 
-  String get value => _value;
+  int get value => _value;
+
+  String get currency => _currency;
 
   Map<String, dynamic> toMap() {
     return {
-      nameKey: _name,
+      titleKey: _title,
       valueKey: _value,
+      currencyKey: _currency,
     };
   }
 }

@@ -24,21 +24,27 @@ class FirestoreHelper {
         .document(_uid)
         .get()
         .then((snapshot) {
-          return snapshot.data['defCar'];
+      return snapshot.data['defCar'];
     });
+  }
+
+  Stream<QuerySnapshot> getCarTaxes() {
+    return _firestore.collection('users').document(_uid)
+        .collection(_defCarName)
+        .snapshots();
   }
 
   Future<Null> addTax(Tax tax, String collection) async {
     await _firestore
         .collection(collection)
-        .document(tax.name)
+        .document(tax.title)
         .setData(tax.toMap());
   }
 
   Future<Null> updateTax(Tax tax, String collection) async {
     await _firestore
         .collection(collection)
-        .document(tax.name)
+        .document(tax.title)
         .updateData(tax.toMap());
   }
 
