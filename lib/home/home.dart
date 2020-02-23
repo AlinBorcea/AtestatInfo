@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
 import '../app_widgets/widgets.dart';
-import 'edit_tax.dart';
+import 'add_tax.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/tax.dart';
 import '../main.dart';
@@ -14,9 +14,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  /// Firebase related global variables.
   FirestoreHelper _firestoreHelper = FirestoreHelper();
   AuthHelper _authHelper = AuthHelper();
   FirebaseUser _user;
+
+  /// TextEditingControllers used to edit a tax.
 
   @override
   void initState() {
@@ -24,6 +27,7 @@ class _HomeState extends State<Home> {
     _init();
   }
 
+  /// Helper functions area.
   void _init() async {
     if (!await _authHelper.isLoggedIn()) {
       await _authHelper.signInWithGoogle();
@@ -35,13 +39,104 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
+  /// Show dialogs area.
   void _openAccountMenu() {
     /// TODO | create an account menu to log out and change account
   }
 
+  void _showEditTaxDialog(BuildContext context, Tax tax) {
+    TextEditingController _titleController = TextEditingController();
+    TextEditingController _valueController = TextEditingController();
+    TextEditingController _currencyController = TextEditingController();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Text('Edit tax'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(hintText: 'Title'),
+                  controller: _titleController,
+                ),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Value'),
+                  controller: _valueController,
+                ),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Currency'),
+                  controller: _currencyController,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  _titleController.dispose();
+                  _valueController.dispose();
+                  _currencyController.dispose();
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('Done'),
+                onPressed: () {
+                  _firestoreHelper.updateTax(
+                      tax,
+                      Tax(
+                          _titleController.text,
+                          int.parse(_valueController.text),
+                          _currencyController.text));
+                  _titleController.dispose();
+                  _valueController.dispose();
+                  _currencyController.dispose();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _showDeleteTaxDialog(BuildContext context, Tax tax) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Text('Are you sure you want to delete tax ${tax.title}?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('No'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () {
+                  _firestoreHelper.deleteTax(tax);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  /// Backend helper functions
+
+  /// UI.
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     /// TODO | add app drawer
     return Scaffold(
       drawer: Drawer(
@@ -78,7 +173,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: Center(
-        child: Column(
+        child: ListView(
           children: <Widget>[
             /// CarCard
             Container(
@@ -89,15 +184,16 @@ class _HomeState extends State<Home> {
             /// taxes
             Container(
               margin: EdgeInsets.only(top: 24.0),
-              child: _taxesBody(),
+              child: _taxesBody(context),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EditTax(_firestoreHelper.defCarName, 0))),
+        /// TODO | create add_tax.dart
+        //onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+          //  builder: (context) => EditTax(_firestoreHelper.defCarName, 0))),
       ),
     );
   }
@@ -115,7 +211,7 @@ class _HomeState extends State<Home> {
             ],
           )
         // has at least one car
-    /// TODO | create car menu
+        /// TODO | create car menu
         : CarView(
             background: 'images/porsche.jpg',
             height: 256.0,
@@ -141,11 +237,11 @@ class _HomeState extends State<Home> {
           );
   }
 
-  Widget _taxesBody() {
+  Widget _taxesBody(BuildContext context) {
     return _firestoreHelper.defCarName == null
         ? null
         : StreamBuilder<QuerySnapshot>(
-            stream: _firestoreHelper.getCarTaxes(),
+            stream: _firestoreHelper.getCarTaxesStream(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) return Text(snapshot.error);
@@ -162,8 +258,11 @@ class _HomeState extends State<Home> {
                     children: snapshot.data.documents
                         .map((DocumentSnapshot snapshot) {
                       return GestureDetector(
-                        onTap: () => _editTax(),
-                        onHorizontalDragStart: (details) => _deleteTax(),
+                        onTap: () => _showEditTaxDialog(
+                            context, Tax.fromMap(snapshot.data)),
+                        onHorizontalDragStart: (details) =>
+                            _showDeleteTaxDialog(
+                                context, Tax.fromMap(snapshot.data)),
                         child: ListTile(
                           title: Text('${snapshot.data[Tax.titleKey]}'),
                           subtitle: Text(
@@ -176,13 +275,4 @@ class _HomeState extends State<Home> {
             },
           );
   }
-
-  void _editTax() {
-    /// TODO | edit tax Dialog
-  }
-
-  void _deleteTax() {
-    /// TODO | delete tax Dialog
-  }
-
 }

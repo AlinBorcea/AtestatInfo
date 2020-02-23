@@ -9,6 +9,12 @@ class Tax {
 
   Tax(this._title, this._value, this._currency);
 
+  Tax.fromMap(Map<String, dynamic> map) {
+    _title = map[titleKey];
+    _value = map[valueKey];
+    _currency = map[currencyKey];
+  }
+
   String get title => _title;
 
   int get value => _value;

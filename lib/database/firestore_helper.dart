@@ -11,7 +11,6 @@ class FirestoreHelper {
 
   Future<Null> initCar() async {
     _defCarName = await getDefCarName();
-    debugPrint(_defCarName);
   }
 
   set uid(String uid) => _uid = uid;
@@ -28,26 +27,38 @@ class FirestoreHelper {
     });
   }
 
-  Stream<QuerySnapshot> getCarTaxes() {
-    return _firestore.collection('users').document(_uid)
+  Stream<QuerySnapshot> getCarTaxesStream() {
+    return _firestore
+        .collection('users')
+        .document(_uid)
         .collection(_defCarName)
         .snapshots();
   }
 
-  Future<Null> addTax(Tax tax, String collection) async {
-    await _firestore
-        .collection(collection)
+  void addTax(Tax tax) {
+    _firestore
+        .collection('users')
+        .document(_uid)
+        .collection(_defCarName)
         .document(tax.title)
         .setData(tax.toMap());
   }
 
-  Future<Null> updateTax(Tax tax, String collection) async {
-    await _firestore
-        .collection(collection)
-        .document(tax.title)
-        .updateData(tax.toMap());
+  void updateTax(Tax oldTax, Tax newTax) {
+    deleteTax(oldTax);
+    addTax(newTax);
   }
 
+  void deleteTax(Tax tax) {
+    _firestore
+        .collection('users')
+        .document(_uid)
+        .collection(_defCarName)
+        .document(tax.title)
+        .delete();
+  }
+
+  /// User related.
   Future<bool> userExists(FirebaseUser user) async {
     return _firestore
         .collection('users')
