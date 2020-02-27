@@ -20,16 +20,6 @@ class CarView extends StatefulWidget {
     this.subtitle,
     this.titleStyle,
     this.subtitleStyle,
-    this.icon1,
-    this.link1,
-    this.fun1,
-    this.icon2,
-    this.link2,
-    this.fun2,
-    this.icon3,
-    this.link3,
-    this.fun3,
-    this.underLine,
   });
 
   final double height;
@@ -42,20 +32,6 @@ class CarView extends StatefulWidget {
   final String subtitle;
   final TextStyle titleStyle;
   final TextStyle subtitleStyle;
-
-  final IconData icon1;
-  final String link1;
-  final Function fun1;
-
-  final IconData icon2;
-  final String link2;
-  final Function fun2;
-
-  final IconData icon3;
-  final String link3;
-  final Function fun3;
-
-  final Color underLine;
 
   @override
   State createState() => _CarViewState();
@@ -104,66 +80,6 @@ class _CarViewState extends State<CarView> {
                     widget.subtitle,
                     style: widget.subtitleStyle,
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          /// links
-          Container(
-            margin: EdgeInsets.only(left: 4.0, top: 2.0, right: 4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                /// link1
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      widget.icon1,
-                      color: Colors.blueAccent,
-                    ),
-                    FlatButton(
-                      child: Text(
-                        widget.link1,
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                      onPressed: () => widget.fun1(),
-                    ),
-                  ],
-                ),
-
-                /// link2
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      widget.icon2,
-                      color: Colors.blueAccent,
-                    ),
-                    FlatButton(
-                      child: Text(
-                        widget.link2,
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                      onPressed: () => widget.fun2(),
-                    ),
-                  ],
-                ),
-
-                /// link3
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      widget.icon3,
-                      color: Colors.blueAccent,
-                    ),
-                    FlatButton(
-                      child: Text(
-                        widget.link3,
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
-                      onPressed: () => widget.fun3(),
-                    ),
-                  ],
                 ),
               ],
             ),
