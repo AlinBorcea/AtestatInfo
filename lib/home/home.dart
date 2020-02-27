@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
 import '../app_widgets/widgets.dart';
-import 'home_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/tax.dart';
 import '../models/car.dart';
 import '../main.dart';
+import 'car_form.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -115,17 +115,9 @@ class _HomeState extends State<Home> {
           _drawerButton('Switch car', () {}),
           _drawerLine(),
           _drawerButton('Add a car', () {
-            _firestoreHelper.addCar(Car(
-              'Volkswagen',
-              'Golf 8',
-              'CJ 08 CAR',
-              Colors.blue,
-              2020,
-              null,
-            ));
+            Navigator.of(context).pop();
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarForm()));
           }),
-          _drawerLine(),
-          _drawerButton('Delete a car', () {}),
           _drawerLine(),
         ],
       ),
@@ -218,5 +210,102 @@ class _HomeState extends State<Home> {
               }
             },
           );
+  }
+}
+
+class HomeHelper {
+  HomeHelper(this._firestoreHelper);
+
+  final FirestoreHelper _firestoreHelper;
+
+  /// Show dialogs area.
+  void openAccountMenu() {
+    /// TODO | create an account menu to log out and change account
+  }
+
+  void showEditTaxDialog(BuildContext context, Tax tax) {
+    TextEditingController _titleController = TextEditingController();
+    TextEditingController _valueController = TextEditingController();
+    TextEditingController _currencyController = TextEditingController();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Text('Edit tax'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(hintText: 'Title'),
+                  controller: _titleController,
+                ),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Value'),
+                  controller: _valueController,
+                ),
+                TextField(
+                  decoration: InputDecoration(hintText: 'Currency'),
+                  controller: _currencyController,
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  _titleController.dispose();
+                  _valueController.dispose();
+                  _currencyController.dispose();
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('Done'),
+                onPressed: () {
+                  _firestoreHelper.updateTax(
+                      tax,
+                      Tax(
+                          _titleController.text,
+                          int.parse(_valueController.text),
+                          _currencyController.text));
+                  _titleController.dispose();
+                  _valueController.dispose();
+                  _currencyController.dispose();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void showDeleteTaxDialog(BuildContext context, Tax tax) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Text('Are you sure you want to delete tax ${tax.title}?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('No'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () {
+                  _firestoreHelper.deleteTax(tax);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 }
