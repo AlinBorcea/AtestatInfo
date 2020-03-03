@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:taxe_auto/models/car.dart';
+import '../database/firestore_helper.dart';
 
 class CarForm extends StatefulWidget {
+  CarForm(this._firestoreHelper);
+
+  final FirestoreHelper _firestoreHelper;
+
   @override
   State createState() => _CarFormState();
 }
@@ -27,7 +33,7 @@ class _CarFormState extends State<CarForm> {
           IconButton(
             icon: Icon(Icons.done),
             onPressed: () {
-              debugPrint('Done!');
+              _addCar();
             },
           )
         ],
@@ -48,28 +54,42 @@ class _CarFormState extends State<CarForm> {
               decoration: InputDecoration(hintText: 'Plate number'),
               controller: _plateNumberController,
             ),
-            NumberPicker.integer(
-              highlightSelectedValue: true,
-              initialValue: 2020,
-              minValue: 1980,
-              maxValue: 2020,
-              onChanged: (num) {
-                setState(() {
-                  _manufactureYear = num;
-                });
-              },
-            ),
-            ColorPicker(
-              pickerColor: Colors.blue,
-              onColorChanged: (newColor) {
-                setState(() {
-                  _color = newColor;
-                });
-              },
+            RaisedButton(
+              child: Text('Pick year. Current: $_manufactureYear', style: TextStyle(color: Colors.white),),
+              color: Colors.blue,
+              onPressed: () => _showPickYear(context),
             ),
           ],
         ),
       ),
     );
   }
+
+  void _showPickYear(BuildContext context) {
+    Picker(
+        adapter: NumberPickerAdapter(
+            data: [NumberPickerColumn(begin: 1980, end: 2020)]),
+        delimiter: [
+          PickerDelimiter(child: Container(
+            width: 30.0,
+            alignment: Alignment.center,
+            child: Icon(Icons.more_vert),
+          ))
+        ],
+        hideHeader: true,
+        title: new Text("Please Select"),
+        onConfirm: (Picker picker, List<int> values) {
+          setState(() {
+            _manufactureYear = values.last + 1980;
+          });
+        }
+    ).showDialog(context);
+  }
+
+  void _addCar() {
+    widget._firestoreHelper.addCar(Car(
+        _brandController.text, _nameController.text,
+        _plateNumberController.text, Colors.red, _manufactureYear, null));
+  }
+
 }

@@ -13,7 +13,8 @@ dependencies:
   firebase_core: ^0.4.0+9
   firebase_auth: ^0.14.0+5
   google_sign_in: ^4.0.0
-  numberpicker: ^1.1.0
+  flutter_picker:
+    git: git://github.com/yangyxd/flutter_picker.git
   flutter_colorpicker: ^0.3.2
   #firebase_analytics: ^5.0.2
 

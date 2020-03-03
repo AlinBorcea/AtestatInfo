@@ -19,7 +19,6 @@ class _HomeState extends State<Home> {
   FirestoreHelper _firestoreHelper = FirestoreHelper();
   AuthHelper _authHelper = AuthHelper();
   FirebaseUser _user;
-  HomeHelper _homeHelper;
 
   @override
   void initState() {
@@ -36,7 +35,6 @@ class _HomeState extends State<Home> {
     _user = _authHelper.user;
     _firestoreHelper.uid = _user.uid;
     await _firestoreHelper.initCar();
-    _homeHelper = HomeHelper(_firestoreHelper);
     setState(() {});
   }
 
@@ -58,7 +56,7 @@ class _HomeState extends State<Home> {
         title: Text('Taxes'),
         actions: <Widget>[
           GestureDetector(
-            onTap: () => _homeHelper.openAccountMenu(),
+            onTap: () => _openAccountMenu(),
             child: CircleAvatar(
               minRadius: 15,
               backgroundColor: Colors.white,
@@ -70,8 +68,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: Center(
-        child: ListView(
+      body: ListView(
           children: <Widget>[
             /// CarCard
             Container(
@@ -86,14 +83,6 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-
-        /// TODO | create add_tax.dart
-        //onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-        //  builder: (context) => EditTax(_firestoreHelper.defCarName, 0))),
-      ),
     );
   }
 
@@ -116,7 +105,7 @@ class _HomeState extends State<Home> {
           _drawerLine(),
           _drawerButton('Add a car', () {
             Navigator.of(context).pop();
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarForm()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarForm(_firestoreHelper)));
           }),
           _drawerLine(),
         ],
@@ -194,10 +183,10 @@ class _HomeState extends State<Home> {
                     children: snapshot.data.documents
                         .map((DocumentSnapshot snapshot) {
                       return GestureDetector(
-                        onTap: () => _homeHelper.showEditTaxDialog(
+                        onTap: () => _showEditTaxDialog(
                             context, Tax.fromMap(snapshot.data)),
                         onHorizontalDragStart: (details) =>
-                            _homeHelper.showDeleteTaxDialog(
+                            _showDeleteTaxDialog(
                                 context, Tax.fromMap(snapshot.data)),
                         child: ListTile(
                           title: Text('${snapshot.data[Tax.titleKey]}'),
@@ -211,19 +200,13 @@ class _HomeState extends State<Home> {
             },
           );
   }
-}
-
-class HomeHelper {
-  HomeHelper(this._firestoreHelper);
-
-  final FirestoreHelper _firestoreHelper;
 
   /// Show dialogs area.
-  void openAccountMenu() {
+  void _openAccountMenu() {
     /// TODO | create an account menu to log out and change account
   }
 
-  void showEditTaxDialog(BuildContext context, Tax tax) {
+  void _showEditTaxDialog(BuildContext context, Tax tax) {
     TextEditingController _titleController = TextEditingController();
     TextEditingController _valueController = TextEditingController();
     TextEditingController _currencyController = TextEditingController();
@@ -283,7 +266,7 @@ class HomeHelper {
         });
   }
 
-  void showDeleteTaxDialog(BuildContext context, Tax tax) {
+  void _showDeleteTaxDialog(BuildContext context, Tax tax) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -308,4 +291,5 @@ class HomeHelper {
           );
         });
   }
+
 }

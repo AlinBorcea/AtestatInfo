@@ -17,9 +17,14 @@ class FirestoreHelper {
         .collection('users')
         .document(_uid)
         .collection('cars')
-        .document(car.name)
-        .setData(car.toMap());
+        .add(car.toMap());
+
+    _firestore.collection('users').document(_uid).updateData({
+      'defCar': car.name,
+    });
   }
+
+  //Future<bool> carExists(Car car) {// TODO | check if car exists}
 
   set uid(String uid) => _uid = uid;
 
@@ -48,8 +53,7 @@ class FirestoreHelper {
         .collection('users')
         .document(_uid)
         .collection(_defCarName)
-        .document(tax.title)
-        .setData(tax.toMap());
+        .add(tax.toMap());
   }
 
   void updateTax(Tax oldTax, Tax newTax) {
