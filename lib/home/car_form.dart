@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:taxe_auto/models/car.dart';
 import '../database/firestore_helper.dart';
 
@@ -18,7 +18,7 @@ class _CarFormState extends State<CarForm> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _plateNumberController = TextEditingController();
   int _manufactureYear;
-  Color _color;
+  Color _color = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +55,17 @@ class _CarFormState extends State<CarForm> {
               controller: _plateNumberController,
             ),
             RaisedButton(
-              child: Text('Pick year. Current: $_manufactureYear', style: TextStyle(color: Colors.white),),
+              child: Text(
+                'Pick year. Current: $_manufactureYear',
+                style: TextStyle(color: Colors.white),
+              ),
               color: Colors.blue,
               onPressed: () => _showPickYear(context),
+            ),
+            RaisedButton(
+              child: Text('Pick color'),
+              color: _color,
+              onPressed: () => _showColorPicker(context),
             ),
           ],
         ),
@@ -70,7 +78,8 @@ class _CarFormState extends State<CarForm> {
         adapter: NumberPickerAdapter(
             data: [NumberPickerColumn(begin: 1980, end: 2020)]),
         delimiter: [
-          PickerDelimiter(child: Container(
+          PickerDelimiter(
+              child: Container(
             width: 30.0,
             alignment: Alignment.center,
             child: Icon(Icons.more_vert),
@@ -82,14 +91,39 @@ class _CarFormState extends State<CarForm> {
           setState(() {
             _manufactureYear = values.last + 1980;
           });
-        }
-    ).showDialog(context);
+        }).showDialog(context);
+  }
+
+  void _showColorPicker(BuildContext context) {
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        title: Text('Pick color'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Done'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+        content: MaterialColorPicker(
+          selectedColor: Colors.red,
+          onColorChange: (Color newColor) {
+            setState(() {
+              _color = newColor;
+            });
+          },
+        ),
+      );
+    });
   }
 
   void _addCar() {
     widget._firestoreHelper.addCar(Car(
-        _brandController.text, _nameController.text,
-        _plateNumberController.text, Colors.red, _manufactureYear, null));
+        _brandController.text,
+        _nameController.text,
+        _plateNumberController.text,
+        _color.hashCode,
+        _manufactureYear,
+        null));
   }
-
 }

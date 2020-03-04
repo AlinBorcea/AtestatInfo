@@ -13,14 +13,12 @@ class FirestoreHelper {
   }
 
   void addCar(Car car) {
-    _firestore
-        .collection('users')
-        .document(_uid)
-        .collection('cars')
-        .add(car.toMap());
+    _firestore.collection('users').document(_uid).setData({
+      '${car.brand} ${car.name}': car.toMap(),
+    }, merge: true);
 
     _firestore.collection('users').document(_uid).updateData({
-      'defCar': car.name,
+      'defCar': '${car.brand} ${car.name}',
     });
   }
 
@@ -46,6 +44,17 @@ class FirestoreHelper {
         .document(_uid)
         .collection(_defCarName)
         .snapshots();
+  }
+
+  Future<Map<String, dynamic>> getCars() async {
+    return await _firestore
+        .collection('users')
+        .document(_uid)
+        .get()
+        .then((snapshot) {
+      snapshot.data.remove('defCar');
+      return snapshot.data;
+    });
   }
 
   void addTax(Tax tax) {
