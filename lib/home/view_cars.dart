@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../database/firestore_helper.dart';
 import '../models/car.dart';
+import '../app_widgets/widgets.dart';
 
 class ViewCars extends StatefulWidget {
   ViewCars(this._firestoreHelper);
@@ -13,20 +14,13 @@ class ViewCars extends StatefulWidget {
 }
 
 class _ViewCarsState extends State<ViewCars> {
-  Map<String, dynamic> _carMap;
-
   @override
   void initState() {
     super.initState();
     _init();
   }
 
-  void _init() async {
-    Map<String, dynamic> temp = await widget._firestoreHelper.getCars();
-    setState(() {
-      _carMap = temp;
-    });
-  }
+  void _init() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +34,44 @@ class _ViewCarsState extends State<ViewCars> {
         centerTitle: true,
       ),
       body: Center(
-        child: ListView.builder(itemBuilder: (context, i) {
+        child: StreamBuilder<QuerySnapshot>(
+            stream: widget._firestoreHelper.getCarStream(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) return Text(snapshot.error);
 
-        }),
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return waitingWidget();
+
+                case ConnectionState.none:
+                  return noConnectionWidget();
+
+                default:
+                  return Column(
+                    children: snapshot.data.documents
+                        .map((DocumentSnapshot snapshot) {
+                      return GestureDetector(
+                          child: ExpansionTile(
+                        title: Text(
+                            '${snapshot.data[Car.brandKey]} ${snapshot.data[Car.nameKey]}'),
+                        children: <Widget>[
+                          Text(_carInfo(snapshot.data)),
+                        ],
+                      ));
+                    }).toList(),
+                  );
+              }
+            }),
       ),
     );
+  }
+
+  String _carInfo(Map<String, dynamic> map) {
+    String str = '';
+    map.forEach((k, v) {
+      str += '$k: $v\n';
+    });
+    return str;
   }
 }

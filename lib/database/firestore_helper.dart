@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:taxe_auto/models/tax.dart';
 import '../models/car.dart';
 
@@ -13,10 +14,11 @@ class FirestoreHelper {
   }
 
   void addCar(Car car) {
-    _firestore.collection('users').document(_uid).setData({
-      '${car.brand} ${car.name}': car.toMap(),
-    }, merge: true);
-
+    _firestore
+        .collection('users')
+        .document(_uid)
+        .collection('cars')
+        .add(car.toMap());
     _firestore.collection('users').document(_uid).updateData({
       'defCar': '${car.brand} ${car.name}',
     });
@@ -38,23 +40,16 @@ class FirestoreHelper {
     });
   }
 
-  Stream<QuerySnapshot> getCarTaxesStream() {
+  Stream<QuerySnapshot> getCarStream() {
     return _firestore
         .collection('users')
         .document(_uid)
-        .collection(_defCarName)
+        .collection('cars')
         .snapshots();
   }
 
-  Future<Map<String, dynamic>> getCars() async {
-    return await _firestore
-        .collection('users')
-        .document(_uid)
-        .get()
-        .then((snapshot) {
-      snapshot.data.remove('defCar');
-      return snapshot.data;
-    });
+  Stream<DocumentSnapshot> getCarTaxesStream() {
+    return _firestore.collection('users').document(_uid).snapshots();
   }
 
   void addTax(Tax tax) {

@@ -3,6 +3,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:taxe_auto/models/car.dart';
 import '../database/firestore_helper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CarForm extends StatefulWidget {
   CarForm(this._firestoreHelper);
@@ -125,5 +126,21 @@ class _CarFormState extends State<CarForm> {
         _color.hashCode,
         _manufactureYear,
         null));
+
+    _showToast('Car was added');
+    Navigator.of(context).pop();
   }
+
+  void _showToast(String msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIos: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
 }

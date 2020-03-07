@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
+import 'package:taxe_auto/home/view_cars.dart';
 import '../app_widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/tax.dart';
@@ -99,9 +100,9 @@ class _HomeState extends State<Home> {
               ),
             ),
           ),
-          _drawerButton('View cars', () {}),
-          _drawerLine(),
-          _drawerButton('Switch car', () {}),
+          _drawerButton('View cars', () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ViewCars(_firestoreHelper)));
+          }),
           _drawerLine(),
           _drawerButton('Add a car', () {
             Navigator.of(context).pop();
@@ -166,7 +167,7 @@ class _HomeState extends State<Home> {
     return _firestoreHelper.defCarName == null
         ? null
         : StreamBuilder<QuerySnapshot>(
-            stream: _firestoreHelper.getCarTaxesStream(),
+            //stream: _firestoreHelper.getCarTaxesStream(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) return Text(snapshot.error);
