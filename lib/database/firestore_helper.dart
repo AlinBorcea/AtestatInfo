@@ -5,7 +5,7 @@ import 'package:taxe_auto/models/tax.dart';
 import '../models/car.dart';
 
 class FirestoreHelper {
-  Firestore _firestore = Firestore.instance;
+  CollectionReference _ref = Firestore.instance.collection('users');
   String _uid;
   String _defCarName;
 
@@ -14,14 +14,11 @@ class FirestoreHelper {
   }
 
   void addCar(Car car) {
-    _firestore
-        .collection('users')
-        .document(_uid)
-        .collection('cars')
-        .add(car.toMap());
-    _firestore.collection('users').document(_uid).updateData({
+    _ref.document(_uid).collection('cars').add(car.toMap());
+
+    _ref.document(_uid).setData({
       'defCar': '${car.brand} ${car.name}',
-    });
+    }, merge: true);
   }
 
   //Future<bool> carExists(Car car) {// TODO | check if car exists}
@@ -31,53 +28,18 @@ class FirestoreHelper {
   String get defCarName => _defCarName;
 
   Future<String> getDefCarName() async {
-    return await _firestore
-        .collection('users')
-        .document(_uid)
-        .get()
-        .then((snapshot) {
+    return await _ref.document(_uid).get().then((snapshot) {
       return snapshot.data['defCar'];
     });
   }
 
   Stream<QuerySnapshot> getCarStream() {
-    return _firestore
-        .collection('users')
-        .document(_uid)
-        .collection('cars')
-        .snapshots();
-  }
-
-  Stream<DocumentSnapshot> getCarTaxesStream() {
-    return _firestore.collection('users').document(_uid).snapshots();
-  }
-
-  void addTax(Tax tax) {
-    _firestore
-        .collection('users')
-        .document(_uid)
-        .collection(_defCarName)
-        .add(tax.toMap());
-  }
-
-  void updateTax(Tax oldTax, Tax newTax) {
-    deleteTax(oldTax);
-    addTax(newTax);
-  }
-
-  void deleteTax(Tax tax) {
-    _firestore
-        .collection('users')
-        .document(_uid)
-        .collection(_defCarName)
-        .document(tax.title)
-        .delete();
+    return _ref.document(_uid).collection('cars').snapshots();
   }
 
   /// User related.
   Future<bool> userExists(FirebaseUser user) async {
-    return _firestore
-        .collection('users')
+    return _ref
         .where('uid', isEqualTo: '${user.uid}')
         .getDocuments()
         .then((QuerySnapshot snapshot) {
@@ -87,7 +49,7 @@ class FirestoreHelper {
 
   void addUser(FirebaseUser user) async {
     if (!await userExists(user))
-      _firestore.collection('users').document(user.uid).setData({
+      _ref.document(user.uid).setData({
         'uid': user.uid,
       });
   }

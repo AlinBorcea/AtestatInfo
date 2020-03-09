@@ -250,12 +250,6 @@ class _HomeState extends State<Home> {
               FlatButton(
                 child: Text('Done'),
                 onPressed: () {
-                  _firestoreHelper.updateTax(
-                      tax,
-                      Tax(
-                          _titleController.text,
-                          int.parse(_valueController.text),
-                          _currencyController.text));
                   _titleController.dispose();
                   _valueController.dispose();
                   _currencyController.dispose();
@@ -284,7 +278,7 @@ class _HomeState extends State<Home> {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: () {
-                  _firestoreHelper.deleteTax(tax);
+                  //_firestoreHelper.deleteTax(tax);
                   Navigator.of(context).pop();
                 },
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+import 'package:taxe_auto/main.dart';
 import 'package:taxe_auto/models/car.dart';
 import '../database/firestore_helper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,18 +19,29 @@ class _CarFormState extends State<CarForm> {
   TextEditingController _brandController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _plateNumberController = TextEditingController();
-  int _manufactureYear;
-  Color _color = Colors.white;
+  int _manufactureYear = 2008;
+  Color _color = Colors.blue;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        /// styling
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.7),
+        ),
+        backgroundColor: _color,
+        centerTitle: true,
+
+        /// actions
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add a car'),
+        title: Text('Add a car', style: TextStyle(shadows: [
+          Shadow(
+              color: Colors.black, offset: Offset.zero, blurRadius: 1.0)
+        ], color: _color == Colors.white ? Colors.black : Colors.white),),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.done),
@@ -41,30 +53,66 @@ class _CarFormState extends State<CarForm> {
       ),
       body: Center(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
           children: <Widget>[
+            /// brand
             TextField(
-              decoration: InputDecoration(hintText: 'Brand'),
+              decoration: InputDecoration(
+                hintText: 'Brand',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: _color),
+                  borderRadius: new BorderRadius.circular(25.7),
+                ),
+              ),
               controller: _brandController,
             ),
+            SizedBox(height: 4.0,),
+            /// name
             TextField(
-              decoration: InputDecoration(hintText: 'Name'),
+              decoration: InputDecoration(
+                hintText: 'Name',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: _color),
+                  borderRadius: new BorderRadius.circular(25.7),
+                ),
+              ),
               controller: _nameController,
             ),
+            SizedBox(height: 4.0,),
+            /// plate num
             TextField(
-              decoration: InputDecoration(hintText: 'Plate number'),
+              decoration: InputDecoration(
+                hintText: 'Plate number',
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: _color),
+                  borderRadius: new BorderRadius.circular(25.7),
+                ),
+              ),
               controller: _plateNumberController,
             ),
+
+            /// manufacture year
             RaisedButton(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
               child: Text(
                 'Pick year. Current: $_manufactureYear',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(shadows: [
+                  Shadow(
+                      color: Colors.black, offset: Offset.zero, blurRadius: 1.0)
+                ], color: _color == Colors.white ? Colors.black : Colors.white),
               ),
-              color: Colors.blue,
+              color: _color,
               onPressed: () => _showPickYear(context),
             ),
             RaisedButton(
-              child: Text('Pick color'),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+              child: Text(
+                'Pick color',
+                style: TextStyle(shadows: [
+                  Shadow(
+                      color: Colors.black, offset: Offset.zero, blurRadius: 1.0)
+                ], color: _color == Colors.white ? Colors.black : Colors.white),
+              ),
               color: _color,
               onPressed: () => _showColorPicker(context),
             ),
@@ -96,51 +144,64 @@ class _CarFormState extends State<CarForm> {
   }
 
   void _showColorPicker(BuildContext context) {
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-        title: Text('Pick color'),
-        actions: <Widget>[
-          FlatButton(
-            child: Text('Done'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-        content: MaterialColorPicker(
-          selectedColor: Colors.red,
-          onColorChange: (Color newColor) {
-            setState(() {
-              _color = newColor;
-            });
-          },
-        ),
-      );
-    });
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0))),
+            title: Text('Pick color'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Done'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+            content: MaterialColorPicker(
+              selectedColor: Colors.red,
+              onColorChange: (Color newColor) {
+                setState(() {
+                  _color = newColor;
+                });
+              },
+            ),
+          );
+        });
   }
 
-  void _addCar() {
-    widget._firestoreHelper.addCar(Car(
-        _brandController.text,
-        _nameController.text,
-        _plateNumberController.text,
-        _color.hashCode,
-        _manufactureYear,
-        null));
+  bool _dataIsValid() =>
+      _brandController.text.isNotEmpty &&
+      _nameController.text.isNotEmpty &&
+      _plateNumberController.text.isNotEmpty;
 
-    _showToast('Car was added');
-    Navigator.of(context).pop();
+  void _addCar() {
+    if (_dataIsValid()) {
+      widget._firestoreHelper.addCar(Car(
+          _brandController.text,
+          _nameController.text,
+          _plateNumberController.text,
+          _color.hashCode,
+          _manufactureYear,
+          null));
+
+      _showToast('Car was added');
+      Navigator.of(context).pop();
+      main();
+    } else {
+      _showToast('Invalid data!');
+    }
   }
 
   void _showToast(String msg) {
     Fluttertoast.showToast(
-        msg: msg,
+      msg: msg,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
+      backgroundColor: _color,
+
+      textColor: _color == Colors.white ? Colors.black : Colors.white,
       fontSize: 16.0,
     );
   }
-
 }
