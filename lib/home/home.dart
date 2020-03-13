@@ -19,7 +19,6 @@ class _HomeState extends State<Home> {
   /// Firebase related global variables.
   FirestoreHelper _firestoreHelper = FirestoreHelper();
   AuthHelper _authHelper = AuthHelper();
-  FirebaseUser _user;
 
   @override
   void initState() {
@@ -33,8 +32,7 @@ class _HomeState extends State<Home> {
       await _authHelper.signInWithGoogle();
       main();
     }
-    _user = _authHelper.user;
-    _firestoreHelper.uid = _user.uid;
+    _firestoreHelper.uid = _authHelper.user.uid;
     await _firestoreHelper.initCar();
     setState(() {});
   }
@@ -48,6 +46,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: _drawer(),
       appBar: AppBar(
+        backgroundColor: _firestoreHelper.carColor,
         centerTitle: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(

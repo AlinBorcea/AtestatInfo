@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:taxe_auto/main.dart';
 import 'package:taxe_auto/models/car.dart';
 import '../database/firestore_helper.dart';
@@ -38,10 +38,12 @@ class _CarFormState extends State<CarForm> {
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add a car', style: TextStyle(shadows: [
-          Shadow(
-              color: Colors.black, offset: Offset.zero, blurRadius: 1.0)
-        ], color: _color == Colors.white ? Colors.black : Colors.white),),
+        title: Text(
+          'Add a car',
+          style: TextStyle(shadows: [
+            Shadow(color: Colors.black, offset: Offset.zero, blurRadius: 1.0)
+          ], color: _color == Colors.white ? Colors.black : Colors.white),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.done),
@@ -66,7 +68,10 @@ class _CarFormState extends State<CarForm> {
               ),
               controller: _brandController,
             ),
-            SizedBox(height: 4.0,),
+            SizedBox(
+              height: 4.0,
+            ),
+
             /// name
             TextField(
               decoration: InputDecoration(
@@ -78,7 +83,10 @@ class _CarFormState extends State<CarForm> {
               ),
               controller: _nameController,
             ),
-            SizedBox(height: 4.0,),
+            SizedBox(
+              height: 4.0,
+            ),
+
             /// plate num
             TextField(
               decoration: InputDecoration(
@@ -93,7 +101,8 @@ class _CarFormState extends State<CarForm> {
 
             /// manufacture year
             RaisedButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.7)),
               child: Text(
                 'Pick year. Current: $_manufactureYear',
                 style: TextStyle(shadows: [
@@ -105,7 +114,8 @@ class _CarFormState extends State<CarForm> {
               onPressed: () => _showPickYear(context),
             ),
             RaisedButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.7)),
               child: Text(
                 'Pick color',
                 style: TextStyle(shadows: [
@@ -146,27 +156,25 @@ class _CarFormState extends State<CarForm> {
   void _showColorPicker(BuildContext context) {
     showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8.0))),
-            title: Text('Pick color'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Done'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-            content: MaterialColorPicker(
-              selectedColor: Colors.red,
-              onColorChange: (Color newColor) {
-                setState(() {
-                  _color = newColor;
-                });
-              },
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          title: Text('Pick color'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Done'),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-          );
-        });
+          ],
+          content: BlockPicker(
+            pickerColor: _color,
+            onColorChanged: (newColor) {
+              setState(() {
+                _color = newColor;
+              });
+            },
+          ),
+        ));
   }
 
   bool _dataIsValid() =>
@@ -199,7 +207,6 @@ class _CarFormState extends State<CarForm> {
       gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
       backgroundColor: _color,
-
       textColor: _color == Colors.white ? Colors.black : Colors.white,
       fontSize: 16.0,
     );

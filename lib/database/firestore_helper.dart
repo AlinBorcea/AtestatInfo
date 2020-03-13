@@ -8,9 +8,15 @@ class FirestoreHelper {
   CollectionReference _ref = Firestore.instance.collection('users');
   String _uid;
   String _defCarName;
+  Color _color;
 
   Future<Null> initCar() async {
-    _defCarName = await getDefCarName();
+    if (_uid != null) {
+      await _ref.document(_uid).get().then((snapshot) {
+        _defCarName = snapshot.data['defCar'];
+        _color = Color(int.parse(snapshot.data['color']));
+      });
+    }
   }
 
   void addCar(Car car) {
@@ -18,6 +24,7 @@ class FirestoreHelper {
 
     _ref.document(_uid).setData({
       'defCar': '${car.brand} ${car.name}',
+      'color': '${car.color.hashCode.toString()}',
     }, merge: true);
   }
 
@@ -26,6 +33,8 @@ class FirestoreHelper {
   set uid(String uid) => _uid = uid;
 
   String get defCarName => _defCarName;
+
+  Color get carColor => _color;
 
   Future<String> getDefCarName() async {
     return await _ref.document(_uid).get().then((snapshot) {

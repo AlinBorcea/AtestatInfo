@@ -104,13 +104,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_material_color_picker:
+  flutter_colorpicker:
     dependency: "direct main"
     description:
-      name: flutter_material_color_picker
+      name: flutter_colorpicker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.5"
+    version: "0.3.2"
   flutter_picker:
     dependency: "direct main"
     description:
