@@ -19,6 +19,13 @@ class FirestoreHelper {
     }
   }
 
+  Future<String> findCarDocId(Car car) async {
+    return await _ref.document(_uid).collection('cars').where(Car.brandKey, isEqualTo: car.brand)
+        .where(Car.nameKey, isEqualTo: car.name).getDocuments().then((snapshot) {
+          return snapshot.documents[0].documentID;
+    });
+  }
+
   void addCar(Car car) {
     _ref.document(_uid).collection('cars').add(car.toMap());
 
@@ -26,6 +33,17 @@ class FirestoreHelper {
       'defCar': '${car.brand} ${car.name}',
       'color': '${car.color.hashCode.toString()}',
     }, merge: true);
+  }
+
+  void deleteCar(Car car, String docId) async {
+    if (_defCarName == '${car.brand} ${car.name}')
+      _ref.document(_uid).updateData({'color': '0xFF2196F3', 'defCar': ''});
+      
+    _ref.document(_uid).collection('cars').document(docId).delete();
+  }
+
+  void setDefCar(Car car) {
+    _ref.document(_uid).updateData({'defCar': '${car.brand} ${car.name}'});
   }
 
   //Future<bool> carExists(Car car) {// TODO | check if car exists}

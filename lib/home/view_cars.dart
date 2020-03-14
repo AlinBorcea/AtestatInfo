@@ -48,7 +48,7 @@ class _ViewCarsState extends State<ViewCars> {
                   return noConnectionWidget();
 
                 default:
-                  return Column(
+                  return ListView(
                     children: snapshot.data.documents
                         .map((DocumentSnapshot snapshot) {
                       return GestureDetector(
@@ -56,13 +56,64 @@ class _ViewCarsState extends State<ViewCars> {
                         title: Text(
                             '${snapshot.data[Car.brandKey]} ${snapshot.data[Car.nameKey]}'),
                         children: <Widget>[
-                          Text(_carInfo(snapshot.data)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Text(_carInfo(snapshot.data)),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  FlatButton(
+                                    child: Text('Delete'),
+                                    onPressed: () => _deleteCar(
+                                        Car.fromMap(snapshot.data),
+                                        snapshot.documentID,
+                                        context),
+                                  ),
+                                  FlatButton(
+                                    child: Text('Set default'),
+                                    onPressed: () => widget._firestoreHelper
+                                        .setDefCar(Car.fromMap(snapshot.data)),
+                                  ),
+                                  FlatButton(
+                                    child: Text('Update'),
+                                    onPressed: () {
+                                      // TODO | update car
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
                         ],
                       ));
                     }).toList(),
                   );
               }
             }),
+      ),
+    );
+  }
+
+  void _deleteCar(Car car, String docId, BuildContext context) {
+    showDialog(
+      context: context,
+      child: AlertDialog(
+        title:
+            Text('Are you sure you want to delete ${car.brand} ${car.name}?'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('No'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          FlatButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget._firestoreHelper.deleteCar(car, docId);
+              }),
+        ],
       ),
     );
   }
