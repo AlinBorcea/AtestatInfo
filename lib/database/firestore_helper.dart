@@ -20,10 +20,21 @@ class FirestoreHelper {
   }
 
   Future<String> findCarDocId(Car car) async {
-    return await _ref.document(_uid).collection('cars').where(Car.brandKey, isEqualTo: car.brand)
-        .where(Car.nameKey, isEqualTo: car.name).getDocuments().then((snapshot) {
-          return snapshot.documents[0].documentID;
+    return await _ref
+        .document(_uid)
+        .collection('cars')
+        .where(Car.brandKey, isEqualTo: car.brand)
+        .where(Car.nameKey, isEqualTo: car.name)
+        .getDocuments()
+        .then((snapshot) {
+      return snapshot.documents[0].documentID;
     });
+  }
+
+  void setDefCar(Car car) {
+    _ref
+        .document(_uid)
+        .updateData({'defCar': '${car.brand} ${car.name}', 'color': car.color});
   }
 
   void addCar(Car car) {
@@ -38,21 +49,9 @@ class FirestoreHelper {
   void deleteCar(Car car, String docId) async {
     if (_defCarName == '${car.brand} ${car.name}')
       _ref.document(_uid).updateData({'color': '0xFF2196F3', 'defCar': ''});
-      
+
     _ref.document(_uid).collection('cars').document(docId).delete();
   }
-
-  void setDefCar(Car car) {
-    _ref.document(_uid).updateData({'defCar': '${car.brand} ${car.name}'});
-  }
-
-  //Future<bool> carExists(Car car) {// TODO | check if car exists}
-
-  set uid(String uid) => _uid = uid;
-
-  String get defCarName => _defCarName;
-
-  Color get carColor => _color;
 
   Future<String> getDefCarName() async {
     return await _ref.document(_uid).get().then((snapshot) {
@@ -63,6 +62,20 @@ class FirestoreHelper {
   Stream<QuerySnapshot> getCarStream() {
     return _ref.document(_uid).collection('cars').snapshots();
   }
+
+  void addTax(Tax tax) {
+    _ref.document(_uid).collection(_defCarName).add(tax.toMap());
+  }
+
+  Stream<QuerySnapshot> getTaxesStream() {
+    return _ref.document(_uid).collection(_defCarName).snapshots();
+  }
+
+  set uid(String uid) => _uid = uid;
+
+  String get defCarName => _defCarName;
+
+  Color get carColor => _color;
 
   /// User related.
   Future<bool> userExists(FirebaseUser user) async {

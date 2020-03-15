@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
@@ -6,7 +5,7 @@ import 'package:taxe_auto/home/view_cars.dart';
 import '../app_widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/tax.dart';
-import '../models/car.dart';
+import 'tax_form.dart';
 import '../main.dart';
 import 'car_form.dart';
 
@@ -41,8 +40,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
-    /// TODO | add app drawer
     return Scaffold(
       drawer: _drawer(),
       appBar: AppBar(
@@ -83,6 +80,10 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => TaxForm(_firestoreHelper, null))),
+      ),
     );
   }
 
@@ -166,7 +167,7 @@ class _HomeState extends State<Home> {
     return _firestoreHelper.defCarName == null
         ? null
         : StreamBuilder<QuerySnapshot>(
-            //stream: _firestoreHelper.getCarTaxesStream(),
+            stream: _firestoreHelper.getTaxesStream(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) return Text(snapshot.error);

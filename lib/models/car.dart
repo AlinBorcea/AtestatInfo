@@ -40,6 +40,8 @@ class Car {
 
   List<Tax> get taxes => _taxes;
 
+  String nameFormat() => '$brand $name';
+
   Map<String, dynamic> toMap() {
     return {
       brandKey: _brand,
@@ -50,5 +52,4 @@ class Car {
       taxesKey: _taxes,
     };
   }
-
 }
