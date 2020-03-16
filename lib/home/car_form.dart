@@ -185,12 +185,13 @@ class _CarFormState extends State<CarForm> {
   void _addCar() {
     if (_dataIsValid()) {
       widget._firestoreHelper.addCar(Car(
-          _brandController.text,
-          _nameController.text,
-          _plateNumberController.text,
-          _color.hashCode,
-          _manufactureYear,
-          null));
+        widget._firestoreHelper.uid,
+        _brandController.text,
+        _nameController.text,
+        _plateNumberController.text,
+        _color.hashCode.toString(),
+        _manufactureYear.toString(),
+      ));
 
       _showToast('Car was added');
       Navigator.of(context).pop();

@@ -5,22 +5,26 @@ import 'package:taxe_auto/models/tax.dart';
 import '../models/car.dart';
 
 class FirestoreHelper {
-  CollectionReference _ref = Firestore.instance.collection('users');
+  Firestore _firestore = Firestore.instance;
   String _uid;
-  String _defCarName;
-  Color _color;
+  String _docId;
+  Car _defCar;
 
   Future<Null> initCar() async {
     if (_uid != null) {
-      await _ref.document(_uid).get().then((snapshot) {
-        _defCarName = snapshot.data['defCar'];
-        _color = Color(int.parse(snapshot.data['color']));
+      await _firestore
+          .collection('users')
+          .document(_uid)
+          .get()
+          .then((snapshot) async {
+        _defCar = Car.fromMap(snapshot.data['defCar']);
+        //_docId = await findCarDocId(_defCar);
       });
     }
   }
 
-  Future<String> findCarDocId(Car car) async {
-    return await _ref
+  /*Future<String> findCarDocId(Car car) async {
+    return await _firestore.
         .document(_uid)
         .collection('cars')
         .where(Car.brandKey, isEqualTo: car.brand)
@@ -29,57 +33,82 @@ class FirestoreHelper {
         .then((snapshot) {
       return snapshot.documents[0].documentID;
     });
-  }
+  }*/
 
   void setDefCar(Car car) {
-    _ref
+    _firestore
+        .collection('users')
         .document(_uid)
-        .updateData({'defCar': '${car.brand} ${car.name}', 'color': car.color});
+        .updateData({'defCar': car.toMap(), 'color': car.color});
   }
 
   void addCar(Car car) {
-    _ref.document(_uid).collection('cars').add(car.toMap());
-
-    _ref.document(_uid).setData({
-      'defCar': '${car.brand} ${car.name}',
-      'color': '${car.color.hashCode.toString()}',
+    _firestore.collection('cars').add(car.toMap());
+    _firestore.collection('users').document(_uid).setData({
+      'defCar': car.toMap(),
     }, merge: true);
   }
 
-  void deleteCar(Car car, String docId) async {
-    if (_defCarName == '${car.brand} ${car.name}')
-      _ref.document(_uid).updateData({'color': '0xFF2196F3', 'defCar': ''});
+  void deleteCar(Car car) async {
+    if (_defCar.nameFormat() == car.nameFormat())
+      _firestore.collection('users').document(_uid).updateData({
+        'defCar': {'brand': 'none', 'name': 'none', 'color': '0xFF2196F3'}
+      });
 
-    _ref.document(_uid).collection('cars').document(docId).delete();
+    _firestore
+        .collection('cars')
+        .where(Car.ownerIdKey, isEqualTo: _uid)
+        .where(Car.brandKey, isEqualTo: car.brand)
+        .where(Car.nameKey, isEqualTo: car.name)
+        .getDocuments()
+        .then((snapshots) {
+      if (snapshots.documents.length > 0) {
+        snapshots.documents[0].reference.delete();
+        debugPrint(snapshots.documents.length.toString());
+      }
+    });
   }
 
-  Future<String> getDefCarName() async {
-    return await _ref.document(_uid).get().then((snapshot) {
+  Future<Car> getDefCar() async {
+    return await _firestore
+        .collection('users')
+        .document(_uid)
+        .get()
+        .then((snapshot) {
       return snapshot.data['defCar'];
     });
   }
 
   Stream<QuerySnapshot> getCarStream() {
-    return _ref.document(_uid).collection('cars').snapshots();
+    return _firestore
+        .collection('cars')
+        .where(Car.ownerIdKey, isEqualTo: _uid)
+        .snapshots();
   }
 
+  /// taxes
   void addTax(Tax tax) {
-    _ref.document(_uid).collection(_defCarName).add(tax.toMap());
+    _firestore.collection('taxes').add(tax.toMap());
   }
 
   Stream<QuerySnapshot> getTaxesStream() {
-    return _ref.document(_uid).collection(_defCarName).snapshots();
+    return _firestore
+        .collection('taxes')
+        .where(Tax.ownerIdKey, isEqualTo: _uid)
+        .where(Tax.carInfoKey, isEqualTo: _defCar.nameFormat())
+        .snapshots();
   }
 
   set uid(String uid) => _uid = uid;
 
-  String get defCarName => _defCarName;
+  String get uid => _uid;
 
-  Color get carColor => _color;
+  Car get defCar => _defCar;
 
   /// User related.
   Future<bool> userExists(FirebaseUser user) async {
-    return _ref
+    return _firestore
+        .collection('users')
         .where('uid', isEqualTo: '${user.uid}')
         .getDocuments()
         .then((QuerySnapshot snapshot) {
@@ -89,7 +118,7 @@ class FirestoreHelper {
 
   void addUser(FirebaseUser user) async {
     if (!await userExists(user))
-      _ref.document(user.uid).setData({
+      _firestore.collection('users').document(user.uid).setData({
         'uid': user.uid,
       });
   }

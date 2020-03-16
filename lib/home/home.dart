@@ -8,6 +8,7 @@ import '../models/tax.dart';
 import 'tax_form.dart';
 import '../main.dart';
 import 'car_form.dart';
+import '../models/car.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: _drawer(),
       appBar: AppBar(
-        backgroundColor: _firestoreHelper.carColor,
+        backgroundColor: _getColor(),
         centerTitle: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -66,23 +67,24 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: ListView(
-          children: <Widget>[
-            /// CarCard
-            Container(
-              margin: EdgeInsets.only(top: 4.0),
-              child: _carImage(size.width),
-            ),
+        children: <Widget>[
+          /// CarCard
+          Container(
+            margin: EdgeInsets.only(top: 4.0),
+            child: _carImage(size.width),
+          ),
 
-            /// taxes
-            Container(
-              margin: EdgeInsets.only(top: 24.0),
-              child: _taxesBody(context),
-            ),
-          ],
-        ),
+          /// taxes
+          Container(
+            margin: EdgeInsets.only(top: 24.0),
+            child: _taxesBody(context),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => TaxForm(_firestoreHelper, null))),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => TaxForm(_firestoreHelper, null))),
       ),
     );
   }
@@ -101,12 +103,14 @@ class _HomeState extends State<Home> {
             ),
           ),
           _drawerButton('View cars', () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ViewCars(_firestoreHelper)));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ViewCars(_firestoreHelper)));
           }),
           _drawerLine(),
           _drawerButton('Add a car', () {
             Navigator.of(context).pop();
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CarForm(_firestoreHelper)));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => CarForm(_firestoreHelper)));
           }),
           _drawerLine(),
         ],
@@ -134,7 +138,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _carImage(double width) {
-    return _firestoreHelper.defCarName == null
+    return _firestoreHelper.defCar == null
         // no cars
         ? Column(
             children: <Widget>[
@@ -153,18 +157,18 @@ class _HomeState extends State<Home> {
             width: width,
             elevation: 8.0,
             roundness: 16.0,
-            title: '',
+            title: _firestoreHelper.defCar.brand,
             titleStyle: TextStyle(
               fontSize: 32.0,
               color: Colors.white,
             ),
-            subtitle: _firestoreHelper.defCarName,
+            subtitle: _firestoreHelper.defCar.name,
             subtitleStyle: TextStyle(fontSize: 22.0, color: Colors.white),
           );
   }
 
   Widget _taxesBody(BuildContext context) {
-    return _firestoreHelper.defCarName == null
+    return _firestoreHelper.defCar == null
         ? null
         : StreamBuilder<QuerySnapshot>(
             stream: _firestoreHelper.getTaxesStream(),
@@ -181,8 +185,7 @@ class _HomeState extends State<Home> {
 
                 default:
                   return Column(
-                    children: snapshot.data.documents
-                        .map((DocumentSnapshot snapshot) {
+                    children: snapshot.data.documents.map((snapshot) {
                       return GestureDetector(
                         onTap: () => _showEditTaxDialog(
                             context, Tax.fromMap(snapshot.data)),
@@ -287,4 +290,9 @@ class _HomeState extends State<Home> {
         });
   }
 
+  Color _getColor() {
+    if (_firestoreHelper.defCar != null) if (_firestoreHelper.defCar.color !=
+        null) return Color(int.parse(_firestoreHelper.defCar.color));
+    return Colors.blue;
+  }
 }

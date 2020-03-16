@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'tax.dart';
 
 class Car {
+  static const String ownerIdKey = 'owner';
   static const String brandKey = 'brand';
   static const String nameKey = 'name';
   static const String plateNumberKey = 'plateNumber';
@@ -9,28 +10,30 @@ class Car {
   static const String manufactureYearKey = 'manufactureYear';
   static const String taxesKey = 'taxes';
 
+  String _ownerId;
   String _brand;
   String _name;
   String _plateNumber;
-  int _colorCode;
-  int _manufactureYear;
-  List<Tax> _taxes;
+  String _colorCode;
+  String _manufactureYear;
 
-  Car(this._brand, this._name, this._plateNumber, this._colorCode,
-      this._manufactureYear, this._taxes);
+  Car(this._ownerId, this._brand, this._name, this._plateNumber, this._colorCode,
+      this._manufactureYear);
 
-  Car.fromMap(Map<String, dynamic> carMap) {
+  Car.fromMap(Map<dynamic, dynamic> carMap) {
+    _ownerId = carMap[ownerIdKey];
     _brand = carMap[brandKey];
     _name = carMap[nameKey];
     _plateNumber = carMap[plateNumberKey];
-    _colorCode = Color(carMap[colorKey]).hashCode;
+    _colorCode = carMap[colorKey];
     _manufactureYear = carMap[manufactureYearKey];
-    _taxes = carMap[taxesKey];
   }
 
-  int get manufactureYear => _manufactureYear;
+  String get ownerId => _ownerId;
 
-  int get color => _colorCode;
+  String get manufactureYear => _manufactureYear;
+
+  String get color => _colorCode;
 
   String get plateNumber => _plateNumber;
 
@@ -38,18 +41,16 @@ class Car {
 
   String get brand => _brand;
 
-  List<Tax> get taxes => _taxes;
-
   String nameFormat() => '$brand $name';
 
   Map<String, dynamic> toMap() {
     return {
+      ownerIdKey: _ownerId,
       brandKey: _brand,
       nameKey: _name,
       plateNumberKey: _plateNumber,
       colorKey: _colorCode,
       manufactureYearKey: _manufactureYear,
-      taxesKey: _taxes,
     };
   }
 }

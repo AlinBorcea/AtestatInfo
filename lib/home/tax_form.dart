@@ -63,19 +63,17 @@ class _TaxFormState extends State<TaxForm> {
     );
   }
 
-  bool _taxIsValid() {
-    bool isInt = true;
-    try {
-      int.parse(_valueController.text);
-    } catch(exception) {
-      isInt = false;
-    }
-    return _nameController.text.isNotEmpty && isInt;
-  }
+  bool _taxIsValid() => true;
 
-  void _addTax() {
+  void _addTax() async {
     if (_taxIsValid())
-      widget._firestoreHelper.addTax(Tax(_nameController.text, int.parse(_valueController.text), 'Euro'));
+      widget._firestoreHelper.addTax(Tax(
+          widget._firestoreHelper.uid,
+          widget._firestoreHelper.defCar.nameFormat(),
+          _nameController.text,
+          _valueController.text,
+          'Euro'));
+    else
+      debugPrint('=> invalid tax');
   }
-
 }

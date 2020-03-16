@@ -111,7 +111,7 @@ class _ViewCarsState extends State<ViewCars> {
               child: Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop();
-                widget._firestoreHelper.deleteCar(car, docId);
+                widget._firestoreHelper.deleteCar(car);
               }),
         ],
       ),
