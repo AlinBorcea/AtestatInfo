@@ -28,7 +28,10 @@ class _CarFormState extends State<CarForm> {
       appBar: AppBar(
         /// styling
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.7),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(16.0),
+            bottomRight: Radius.circular(16.0),
+          ),
         ),
         backgroundColor: _color,
         centerTitle: true,
@@ -189,7 +192,7 @@ class _CarFormState extends State<CarForm> {
         _brandController.text,
         _nameController.text,
         _plateNumberController.text,
-        _color.hashCode.toString(),
+        Car.getCodeFromColor(_color),
         _manufactureYear.toString(),
       ));
 

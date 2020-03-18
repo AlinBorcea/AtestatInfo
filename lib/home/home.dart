@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: _drawer(),
       appBar: AppBar(
-        backgroundColor: _getColor(),
+        backgroundColor: _firestoreHelper.defCar.color,
         centerTitle: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -53,16 +53,9 @@ class _HomeState extends State<Home> {
         )),
         title: Text('Taxes'),
         actions: <Widget>[
-          GestureDetector(
-            onTap: () => _openAccountMenu(),
-            child: CircleAvatar(
-              minRadius: 15,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                minRadius: 10,
-                child: Icon(Icons.account_circle),
-              ),
-            ),
+          IconButton(
+            icon: Image.network(_authHelper.user.providerData[0].photoUrl),
+            onPressed: () {},
           ),
         ],
       ),
@@ -83,6 +76,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
+        backgroundColor: _firestoreHelper.defCar.color,
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => TaxForm(_firestoreHelper, null))),
       ),
@@ -95,11 +89,17 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Center(
-              child: Icon(
-                Icons.settings_applications,
-                size: 128.0,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  Icons.settings_applications,
+                  size: 32.0,
+                ),
+                Text(_authHelper.user != null && _authHelper.user.displayName != null
+                    ? _authHelper.user.displayName
+                    : '?'),
+              ],
             ),
           ),
           _drawerButton('View cars', () {
@@ -131,7 +131,7 @@ class _HomeState extends State<Home> {
   Widget _drawerLine() {
     return SizedBox.fromSize(
       child: Container(
-        color: Colors.blue,
+        color: _firestoreHelper.defCar.color,
       ),
       size: Size(double.infinity, 4.0),
     );
@@ -290,9 +290,4 @@ class _HomeState extends State<Home> {
         });
   }
 
-  Color _getColor() {
-    if (_firestoreHelper.defCar != null) if (_firestoreHelper.defCar.color !=
-        null) return Color(int.parse(_firestoreHelper.defCar.color));
-    return Colors.blue;
-  }
 }
