@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:taxe_auto/main.dart';
 import 'package:taxe_auto/models/car.dart';
 import '../database/firestore_helper.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -138,7 +137,7 @@ class _CarFormState extends State<CarForm> {
   void _showPickYear(BuildContext context) {
     Picker(
         adapter: NumberPickerAdapter(
-            data: [NumberPickerColumn(begin: 1980, end: 2020)]),
+            data: [NumberPickerColumn(begin: 1980, end: 2020, initValue: _manufactureYear)]),
         delimiter: [
           PickerDelimiter(
               child: Container(
@@ -198,7 +197,6 @@ class _CarFormState extends State<CarForm> {
 
       _showToast('Car was added');
       Navigator.of(context).pop();
-      main();
     } else {
       _showToast('Invalid data!');
     }

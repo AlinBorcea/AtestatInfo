@@ -8,7 +8,6 @@ class Car {
   static const String plateNumberKey = 'plateNumber';
   static const String colorKey = 'color';
   static const String manufactureYearKey = 'manufactureYear';
-  static const String taxesKey = 'taxes';
 
   String _ownerId;
   String _brand;

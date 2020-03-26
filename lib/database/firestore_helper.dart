@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,40 +8,40 @@ import '../models/car.dart';
 
 class FirestoreHelper {
   Firestore _firestore = Firestore.instance;
+  StreamSubscription _streamSubscription;
   String _uid;
-  String _docId;
   Car _defCar;
 
   Future<Null> initCar() async {
     if (_uid != null) {
-      await _firestore
+      _defCar = Car.fromMap(await _firestore
           .collection('users')
           .document(_uid)
           .get()
-          .then((snapshot) async {
-        _defCar = Car.fromMap(snapshot.data['defCar']);
-        //_docId = await findCarDocId(_defCar);
+          .then((snap) {
+        return snap.data['defCar'];
+      }));
+      _streamSubscription = _firestore
+          .collection('users')
+          .document(_uid)
+          .snapshots()
+          .listen((onData) {
+        _defCar = Car.fromMap(onData.data['defCar']);
       });
     }
   }
 
-  /*Future<String> findCarDocId(Car car) async {
-    return await _firestore.
-        .document(_uid)
-        .collection('cars')
-        .where(Car.brandKey, isEqualTo: car.brand)
-        .where(Car.nameKey, isEqualTo: car.name)
-        .getDocuments()
-        .then((snapshot) {
-      return snapshot.documents[0].documentID;
-    });
-  }*/
+  set uid(String uid) => _uid = uid;
+
+  String get uid => _uid;
+
+  Car get defCar => _defCar;
 
   void setDefCar(Car car) {
     _firestore
         .collection('users')
         .document(_uid)
-        .updateData({'defCar': car.toMap(), 'color': car.color});
+        .updateData({'defCar': car.toMap()});
   }
 
   void addCar(Car car) {
@@ -99,11 +101,20 @@ class FirestoreHelper {
         .snapshots();
   }
 
-  set uid(String uid) => _uid = uid;
-
-  String get uid => _uid;
-
-  Car get defCar => _defCar;
+  void deleteTax(Tax tax) {
+    _firestore
+        .collection('taxes')
+        .where(Tax.ownerIdKey, isEqualTo: _uid)
+        .where(Tax.carInfoKey, isEqualTo: tax.carInfo)
+        .where(Tax.titleKey, isEqualTo: tax.title)
+        .where(Tax.valueKey, isEqualTo: tax.value)
+        .where(Tax.currencyKey, isEqualTo: tax.currency)
+        .snapshots()
+        .first
+        .then((snap) {
+      snap.documents[0].reference.delete();
+    });
+  }
 
   /// User related.
   Future<bool> userExists(FirebaseUser user) async {

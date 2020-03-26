@@ -5,6 +5,7 @@ class Tax {
   static const String valueKey = 'value';
   static const String currencyKey = 'currency';
 
+  String _id;
   String _ownerId;
   String _carInfo;
   String _title;
@@ -20,6 +21,12 @@ class Tax {
     _value = map[valueKey];
     _currency = map[currencyKey];
   }
+
+  // ignore: unnecessary_getters_setters
+  set id(String id) => _id = id;
+
+  // ignore: unnecessary_getters_setters
+  String get id => _id;
 
   String get ownerId => _ownerId;
 

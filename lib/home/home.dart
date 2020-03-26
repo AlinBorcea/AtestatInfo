@@ -8,7 +8,7 @@ import '../models/tax.dart';
 import 'tax_form.dart';
 import '../main.dart';
 import 'car_form.dart';
-import '../models/car.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -44,17 +44,24 @@ class _HomeState extends State<Home> {
     return Scaffold(
       drawer: _drawer(),
       appBar: AppBar(
-        backgroundColor: _firestoreHelper.defCar.color,
+        backgroundColor: _primaryColor(),
         centerTitle: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(16.0),
           bottomLeft: Radius.circular(16.0),
         )),
-        title: Text('Taxes'),
+        title: Text(_firestoreHelper.defCar != null
+            ? _firestoreHelper.defCar.name
+            : 'Loading...'),
         actions: <Widget>[
           IconButton(
-            icon: Image.network(_authHelper.user.providerData[0].photoUrl),
+            icon: _authHelper.user != null
+                ? CircleAvatar(
+              child: Image.network(_authHelper.user.providerData[0].photoUrl),
+              minRadius: 32.0,
+            )
+                : Icon(Icons.hourglass_empty),
             onPressed: () {},
           ),
         ],
@@ -76,7 +83,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        backgroundColor: _firestoreHelper.defCar.color,
+        backgroundColor: _primaryColor(),
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => TaxForm(_firestoreHelper, null))),
       ),
@@ -89,16 +96,10 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+            child: Stack(
               children: <Widget>[
-                Icon(
-                  Icons.settings_applications,
-                  size: 32.0,
-                ),
-                Text(_authHelper.user != null && _authHelper.user.displayName != null
-                    ? _authHelper.user.displayName
-                    : '?'),
+                Positioned.fill(child: SvgPicture.asset('svg/user.svg')),
               ],
             ),
           ),
@@ -131,9 +132,9 @@ class _HomeState extends State<Home> {
   Widget _drawerLine() {
     return SizedBox.fromSize(
       child: Container(
-        color: _firestoreHelper.defCar.color,
+        color: _primaryColor(),
       ),
-      size: Size(double.infinity, 4.0),
+      size: Size(double.infinity, 1.0),
     );
   }
 
@@ -152,18 +153,14 @@ class _HomeState extends State<Home> {
         // has at least one car
         /// TODO | create car menu
         : CarView(
-            background: 'images/porsche.jpg',
+            backgroundImage: SvgPicture.asset(
+              'svg/car.svg',
+              color: _primaryColor(),
+            ),
             height: 256.0,
             width: width,
             elevation: 8.0,
             roundness: 16.0,
-            title: _firestoreHelper.defCar.brand,
-            titleStyle: TextStyle(
-              fontSize: 32.0,
-              color: Colors.white,
-            ),
-            subtitle: _firestoreHelper.defCar.name,
-            subtitleStyle: TextStyle(fontSize: 22.0, color: Colors.white),
           );
   }
 
@@ -281,7 +278,7 @@ class _HomeState extends State<Home> {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: () {
-                  //_firestoreHelper.deleteTax(tax);
+                  _firestoreHelper.deleteTax(tax);
                   Navigator.of(context).pop();
                 },
               ),
@@ -290,4 +287,7 @@ class _HomeState extends State<Home> {
         });
   }
 
+  Color _primaryColor() => _firestoreHelper.defCar == null
+      ? Colors.blue
+      : _firestoreHelper.defCar.color;
 }

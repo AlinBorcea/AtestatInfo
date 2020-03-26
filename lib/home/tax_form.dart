@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../database/firestore_helper.dart';
-import '../models/car.dart';
 import '../models/tax.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -24,6 +23,7 @@ class _TaxFormState extends State<TaxForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: widget._firestoreHelper.defCar.color,
         centerTitle: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -116,6 +116,7 @@ class _TaxFormState extends State<TaxForm> {
           _valueController.text.toString(),
           'Euro'));
       _showToast('Tax added!');
+      Navigator.of(context).pop();
     } else {
       _showToast('Tax could not be added');
     }
@@ -127,7 +128,7 @@ class _TaxFormState extends State<TaxForm> {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
-      backgroundColor: Colors.blue,
+      backgroundColor: widget._firestoreHelper.defCar.color,
       textColor: Colors.white,
       fontSize: 16.0,
     );
