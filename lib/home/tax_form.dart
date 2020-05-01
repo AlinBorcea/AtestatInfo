@@ -74,7 +74,7 @@ class _TaxFormState extends State<TaxForm> {
           ),
           TextField(
             decoration: InputDecoration(
-              hintText: 'Currency',
+              hintText: 'Extra',
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.blue),
                 borderRadius: new BorderRadius.circular(25.7),

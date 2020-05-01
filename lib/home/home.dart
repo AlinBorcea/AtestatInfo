@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:taxe_auto/database/firestore_helper.dart';
 import 'package:taxe_auto/database/auth_helper.dart';
@@ -32,9 +34,14 @@ class _HomeState extends State<Home> {
       await _authHelper.signInWithGoogle();
       main();
     }
-    _firestoreHelper.uid = _authHelper.user.uid;
-    await _firestoreHelper.initCar();
-    setState(() {});
+
+    if (_authHelper.user == null) {
+      main();
+    } else {
+      _firestoreHelper.uid = _authHelper.user.uid;
+      await _firestoreHelper.initCar();
+      setState(() {});
+    }
   }
 
   /// UI.
@@ -51,18 +58,19 @@ class _HomeState extends State<Home> {
           bottomRight: Radius.circular(16.0),
           bottomLeft: Radius.circular(16.0),
         )),
-        title: Text(_firestoreHelper.defCar != null
-            ? _firestoreHelper.defCar.name
-            : 'Loading...'),
+        title: Text(_homeTitle()),
         actions: <Widget>[
           IconButton(
             icon: _authHelper.user != null
                 ? CircleAvatar(
-              child: Image.network(_authHelper.user.providerData[0].photoUrl),
-              minRadius: 32.0,
-            )
+                    child: Image.network(
+                        _authHelper.user.providerData[0].photoUrl),
+                    minRadius: 32.0,
+                  )
                 : Icon(Icons.hourglass_empty),
-            onPressed: () {},
+            onPressed: () {
+              _showLogOutDialog(context);
+            },
           ),
         ],
       ),
@@ -84,10 +92,19 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: _primaryColor(),
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => TaxForm(_firestoreHelper, null))),
+        onPressed: () {
+          if (_authHelper.user != null)
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => TaxForm(_firestoreHelper, null)));
+        },
       ),
     );
+  }
+
+  String _homeTitle() {
+    if (_authHelper.user == null) return 'No user!';
+    if (_firestoreHelper.defCar != null) return _firestoreHelper.defCar.name;
+    return 'Loading';
   }
 
   Widget _drawer() {
@@ -96,7 +113,6 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-
             child: Stack(
               children: <Widget>[
                 Positioned.fill(child: SvgPicture.asset('svg/user.svg')),
@@ -104,11 +120,13 @@ class _HomeState extends State<Home> {
             ),
           ),
           _drawerButton('View cars', () {
+            if (_authHelper.user != null)
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => ViewCars(_firestoreHelper)));
           }),
           _drawerLine(),
           _drawerButton('Add a car', () {
+            if (_authHelper.user != null)
             Navigator.of(context).pop();
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => CarForm(_firestoreHelper)));
@@ -184,8 +202,6 @@ class _HomeState extends State<Home> {
                   return Column(
                     children: snapshot.data.documents.map((snapshot) {
                       return GestureDetector(
-                        onTap: () => _showEditTaxDialog(
-                            context, Tax.fromMap(snapshot.data)),
                         onHorizontalDragStart: (details) =>
                             _showDeleteTaxDialog(
                                 context, Tax.fromMap(snapshot.data)),
@@ -200,11 +216,6 @@ class _HomeState extends State<Home> {
               }
             },
           );
-  }
-
-  /// Show dialogs area.
-  void _openAccountMenu() {
-    /// TODO | create an account menu to log out and change account
   }
 
   void _showEditTaxDialog(BuildContext context, Tax tax) {
@@ -280,6 +291,32 @@ class _HomeState extends State<Home> {
                 onPressed: () {
                   _firestoreHelper.deleteTax(tax);
                   Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void _showLogOutDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            title: Text('Are you sure you want to log out?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('No'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () async {
+                  await _authHelper.signOut();
+                  exit(0);
                 },
               ),
             ],

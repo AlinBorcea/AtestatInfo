@@ -52,23 +52,25 @@ class FirestoreHelper {
   }
 
   void deleteCar(Car car) async {
-    if (_defCar.nameFormat() == car.nameFormat())
-      _firestore.collection('users').document(_uid).updateData({
-        'defCar': {'brand': 'none', 'name': 'none', 'color': '0xFF2196F3'}
-      });
+    if (_uid != null) {
+      if (_defCar.nameFormat() == car.nameFormat())
+        _firestore.collection('users').document(_uid).updateData({
+          'defCar': {'brand': 'none', 'name': 'none', 'color': '0xFF2196F3'}
+        });
 
-    _firestore
-        .collection('cars')
-        .where(Car.ownerIdKey, isEqualTo: _uid)
-        .where(Car.brandKey, isEqualTo: car.brand)
-        .where(Car.nameKey, isEqualTo: car.name)
-        .getDocuments()
-        .then((snapshots) {
-      if (snapshots.documents.length > 0) {
-        snapshots.documents[0].reference.delete();
-        debugPrint(snapshots.documents.length.toString());
-      }
-    });
+      _firestore
+          .collection('cars')
+          .where(Car.ownerIdKey, isEqualTo: _uid)
+          .where(Car.brandKey, isEqualTo: car.brand)
+          .where(Car.nameKey, isEqualTo: car.name)
+          .getDocuments()
+          .then((snapshots) {
+        if (snapshots.documents.length > 0) {
+          snapshots.documents[0].reference.delete();
+          debugPrint(snapshots.documents.length.toString());
+        }
+      });
+    }
   }
 
   Future<Car> getDefCar() async {
@@ -82,10 +84,12 @@ class FirestoreHelper {
   }
 
   Stream<QuerySnapshot> getCarStream() {
-    return _firestore
-        .collection('cars')
-        .where(Car.ownerIdKey, isEqualTo: _uid)
-        .snapshots();
+    return _uid == null
+        ? null
+        : _firestore
+            .collection('cars')
+            .where(Car.ownerIdKey, isEqualTo: _uid)
+            .snapshots();
   }
 
   /// taxes
@@ -94,7 +98,7 @@ class FirestoreHelper {
   }
 
   Stream<QuerySnapshot> getTaxesStream() {
-    return _firestore
+    return _uid == null ? null : _firestore
         .collection('taxes')
         .where(Tax.ownerIdKey, isEqualTo: _uid)
         .where(Tax.carInfoKey, isEqualTo: _defCar.nameFormat())
@@ -102,18 +106,20 @@ class FirestoreHelper {
   }
 
   void deleteTax(Tax tax) {
-    _firestore
-        .collection('taxes')
-        .where(Tax.ownerIdKey, isEqualTo: _uid)
-        .where(Tax.carInfoKey, isEqualTo: tax.carInfo)
-        .where(Tax.titleKey, isEqualTo: tax.title)
-        .where(Tax.valueKey, isEqualTo: tax.value)
-        .where(Tax.currencyKey, isEqualTo: tax.currency)
-        .snapshots()
-        .first
-        .then((snap) {
-      snap.documents[0].reference.delete();
-    });
+    if (_uid != null) {
+      _firestore
+          .collection('taxes')
+          .where(Tax.ownerIdKey, isEqualTo: _uid)
+          .where(Tax.carInfoKey, isEqualTo: tax.carInfo)
+          .where(Tax.titleKey, isEqualTo: tax.title)
+          .where(Tax.valueKey, isEqualTo: tax.value)
+          .where(Tax.currencyKey, isEqualTo: tax.currency)
+          .snapshots()
+          .first
+          .then((snap) {
+        snap.documents[0].reference.delete();
+      });
+    }
   }
 
   /// User related.

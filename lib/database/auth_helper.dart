@@ -41,4 +41,10 @@ class AuthHelper {
     debugPrint('Starting to add user: -> ${user.uid}');
     FirestoreHelper().addUser(user);
   }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    await _googleSignIn.signOut();
+  }
+
 }
